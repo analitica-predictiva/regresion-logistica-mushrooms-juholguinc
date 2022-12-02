@@ -88,21 +88,20 @@ def pregunta_02():
     """
 
     # Importe train_test_split
-    from ____ import ____
+    from sklearn.model_selection import train_test_split
 
     # Cargue los datos de ejemplo y asigne los resultados a `X` y `y`.
     X, y = pregunta_01()
 
     # Divida los datos de entrenamiento y prueba. La semilla del generador de números
     # aleatorios es 123. Use 50 patrones para la muestra de prueba.
-    (X_train, X_test, y_train, y_test,) = ____(
-        ____,
-        ____,
-        test_size=____,
-        random_state=____,
-    )
+    (X_train, X_test, y_train, y_test,) = train_test_split(X, y,
+                                            test_size=0.0061,
+                                            random_state=123,
+                                            )
 
     # Retorne `X_train`, `X_test`, `y_train` y `y_test`
+    print(len(X_train), len(X_test), len(y_train), len(y_test))
     return X_train, X_test, y_train, y_test
 
 
@@ -118,27 +117,26 @@ def pregunta_03():
     pipeline.
     """
 
-    # Importe LogisticRegressionCV
-    # Importe OneHotEncoder
-    # Importe Pipeline
-    from ____ import ____
+    from sklearn.pipeline import Pipeline
+    from sklearn.preprocessing import OneHotEncoder
+    from sklearn.linear_model import LogisticRegressionCV
 
     # Cargue las variables.
-    X_train, _, y_train, _ = pregunta_02()
+    X_train, X_test, y_train, y_test = pregunta_02()
 
     # Cree un pipeline que contenga un estimador OneHotEncoder y un estimador
     # LogisticRegression con una regularización Cs=10
     pipeline = Pipeline(
         steps=[
-            ("____", ____()),
-            ("____", ____(____)),
-        ],
+            ('onehot', OneHotEncoder(dtype="int")),
+            ('lr', LogisticRegressionCV(Cs=10, random_state=0))],
     )
 
     # Entrene el pipeline con los datos de entrenamiento.
-    ____.____(____, ____)
+    pipeline.fit(X_train, y_train)
 
     # Retorne el pipeline entrenado
+    print(pipeline.score(X_train, y_train).round(6), pipeline.score(X_test, y_test).round(6))
     return pipeline
 
 
@@ -148,7 +146,7 @@ def pregunta_04():
     """
 
     # Importe confusion_matrix
-    from ____ import ____
+    from sklearn.metrics import confusion_matrix
 
     # Obtenga el pipeline de la pregunta 3.
     pipeline = pregunta_03()
@@ -157,15 +155,16 @@ def pregunta_04():
     X_train, X_test, y_train, y_test = pregunta_02()
 
     # Evalúe el pipeline con los datos de entrenamiento usando la matriz de confusion.
-    cfm_train = ____(
-        y_true=____,
-        y_pred=____.____(____),
+    cfm_train = confusion_matrix(
+        y_true=y_train,
+        y_pred=pipeline.predict(X_train),
     )
 
-    cfm_test = ____(
-        y_true=____,
-        y_pred=____.____(____),
+    cfm_test = confusion_matrix(
+        y_true=y_test,
+        y_pred=pipeline.predict(X_test),
     )
 
     # Retorne la matriz de confusion de entrenamiento y prueba
+    print(cfm_train,cfm_test)
     return cfm_train, cfm_test
